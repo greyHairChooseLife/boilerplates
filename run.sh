@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Set project name and Make the directory
 read -p 'project name: ' project_name
 
 if [ -d "$project_name" ]; then
@@ -7,7 +8,7 @@ if [ -d "$project_name" ]; then
   exit 0
 fi
 
-# make docker network
+# Generate docker network
 docker network create dev-$project_name-net > /dev/null 2>&1
 if [ $? -eq 0 ]; then
   echo "docker network created: dev-$project_name-net"
@@ -15,7 +16,7 @@ else
   echo "docker network already exists."
 fi
 
-# make dev port
+# Set dev port
 read -p 'select [dev server] port number: ' dev_port
 
 # make directories

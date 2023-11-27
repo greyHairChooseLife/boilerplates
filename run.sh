@@ -9,6 +9,8 @@ read -p 'project name: ' project_name
 if [ -d "$project_name" ]; then
   echo "The directory is exists."
   exit 0
+else
+  mkdir $project_name
 fi
 
 # Generate docker network
@@ -22,16 +24,35 @@ fi
 # Set dev port
 read -p 'select [dev server] port number: ' dev_port
 
+# Add user interaction for choosing Prettier config file
+# User can choose default config file
+read -p 'Do you want to use the default .prettierrc file? (y/n): ' use_default
+
+if [ "$use_default" = "y" ]; then
+cat << EOF > "$project_name/.prettierrc"
+  {
+    "tabWidth": 2,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "all",
+    "printWidth": 80,
+    "useTabs": false,
+    "endOfLine": "auto"
+  }
+EOF
+else
+  read -e -p 'Provide the path to the .prettierrc config file: ' prettierrc_input
+  eval prettierrc='$prettierrc_input'
+  cp $prettierrc $project_name/
+fi
+
+
 # make directories
 mkdir -p $project_name/dev_ops/configs \
          $project_name/db/configs \
          $project_name/db/initSQL \
          $project_name/server/configs \
          $project_name/client/configs \
-
-read -e -p 'provide .prettierrc config file: ' prettierrc_input
-eval prettierrc='$prettierrc_input'
-cp $prettierrc $project_name/
 
 
 touch $project_name/dev_ops/configs/.env.dev \

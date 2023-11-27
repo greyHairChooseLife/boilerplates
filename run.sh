@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Get the directory of the current script
+script_dir="$(dirname "$0")"
+
 # Set project name and Make the directory
 read -p 'project name: ' project_name
 

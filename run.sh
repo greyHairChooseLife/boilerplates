@@ -46,14 +46,13 @@ else
   cp $prettierrc $project_name/
 fi
 
+source $script_dir/client/install_client.sh
 
 # make directories
 mkdir -p $project_name/dev_ops/configs \
          $project_name/db/configs \
          $project_name/db/initSQL \
          $project_name/server/configs \
-         $project_name/client/configs \
-
 
 touch $project_name/dev_ops/configs/.env.dev \
       $project_name/dev_ops/configs/.env \
@@ -61,8 +60,6 @@ touch $project_name/dev_ops/configs/.env.dev \
       $project_name/db/configs/.env \
       $project_name/server/configs/.env.dev \
       $project_name/server/configs/.env \
-      $project_name/client/configs/.env.dev \
-      $project_name/client/configs/.env \
 
 # make docker-compose.yml : Developing 
 cd $project_name/dev_ops
@@ -172,34 +169,4 @@ RUN npm i --only production
 COPY dist/ ./
 
 CMD [ "node", "./index.js" ]
-EOF
-
-# make client/dev.Dockerfile
-cd ~/$project_name/client
-cat << EOF > dev.Dockerfile
-FROM node:14-alpine
-
-WORKDIR /app
-
-COPY package*.json ./
-
-RUN npm i
-
-COPY . .
-
-CMD PORT=3000 npm run dev
-EOF
-
-# make client/Dockerfile
-cd ~/$project_name/client
-cat << EOF > Dockerfile
-FROM node:14-alpine
-
-WORKDIR /app
-
-COPY build/ .
-
-RUN npm install -g serve
-
-CMD serve -s build -l 3000
 EOF

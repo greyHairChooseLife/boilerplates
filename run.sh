@@ -48,16 +48,13 @@ fi
 
 source $script_dir/client/install_client.sh
 source $script_dir/server/install_server.sh
+source $script_dir/database/install_db.sh
 
 # make directories
 mkdir -p $project_name/dev_ops/configs \
-         $project_name/db/configs \
-         $project_name/db/initSQL \
 
 touch $project_name/dev_ops/configs/.env.dev \
       $project_name/dev_ops/configs/.env \
-      $project_name/db/configs/.env.dev \
-      $project_name/db/configs/.env \
 
 # make docker-compose.yml : Developing 
 cd $project_name/dev_ops
@@ -121,20 +118,4 @@ services:
 networks:
   dev-$project_name-net:
     external: true
-EOF
-
-# make db/dev.Dockerfile
-cd ~/$project_name/db
-cat << EOF > dev.Dockerfile
-FROM mariadb:10.11
-
-COPY initSQL/*.sql /docker-entrypoint-initdb.d/
-EOF
-
-# make db/Dockerfile
-cd ~/$project_name/db
-cat << EOF > Dockerfile
-FROM mariadb:10.11
-
-COPY initSQL/*.sql /docker-entrypoint-initdb.d/
 EOF

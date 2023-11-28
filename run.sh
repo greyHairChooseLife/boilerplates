@@ -47,19 +47,17 @@ else
 fi
 
 source $script_dir/client/install_client.sh
+source $script_dir/server/install_server.sh
 
 # make directories
 mkdir -p $project_name/dev_ops/configs \
          $project_name/db/configs \
          $project_name/db/initSQL \
-         $project_name/server/configs \
 
 touch $project_name/dev_ops/configs/.env.dev \
       $project_name/dev_ops/configs/.env \
       $project_name/db/configs/.env.dev \
       $project_name/db/configs/.env \
-      $project_name/server/configs/.env.dev \
-      $project_name/server/configs/.env \
 
 # make docker-compose.yml : Developing 
 cd $project_name/dev_ops
@@ -139,34 +137,4 @@ cat << EOF > Dockerfile
 FROM mariadb:10.11
 
 COPY initSQL/*.sql /docker-entrypoint-initdb.d/
-EOF
-
-# make server/dev.Dockerfile
-cd ~/$project_name/server
-cat << EOF > dev.Dockerfile
-FROM node:14-alpine
-
-WORKDIR /app
-
-COPY . .
-
-RUN npm i
-
-CMD npm run dev
-EOF
-
-# make server/Dockerfile
-cd ~/$project_name/server
-cat << EOF > Dockerfile
-FROM node:14-alpine
-
-WORKDIR /app
-
-COPY package*.json ./
-
-RUN npm i --only production
-
-COPY dist/ ./
-
-CMD [ "node", "./index.js" ]
 EOF

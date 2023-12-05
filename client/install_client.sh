@@ -2,10 +2,10 @@
 
 echo -e "\n## Start config for CLIENT-SIDE ##\n"
 
-mkdir -p $project_name/client/configs
+mkdir -p $application_name/client/configs
 
-touch $project_name/client/configs/.env.dev \
-      $project_name/client/configs/.env \
+touch $application_name/client/configs/.env.dev \
+      $application_name/client/configs/.env \
 
 # Add user interaction for choosing node version for docker containers
 docker_container_node_version=latest
@@ -17,7 +17,7 @@ if [ "$use_latest" = "n" ]; then
 fi
 
 # Write client/dev.Dockerfile
-cat << EOF > $project_name/client/dev.Dockerfile
+cat << EOF > $application_name/client/dev.Dockerfile
 FROM "node:$docker_container_node_version"
 
 WORKDIR /app
@@ -32,7 +32,7 @@ CMD PORT=3000 npm run dev
 EOF
 
 # Write client/Dockerfile
-cat << EOF > $project_name/client/Dockerfile
+cat << EOF > $application_name/client/Dockerfile
 # Stage 1: Build the application
 FROM "node:$docker_container_node_version" as build
 WORKDIR /app

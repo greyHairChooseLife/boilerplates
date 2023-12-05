@@ -2,7 +2,7 @@
 
 echo -e "\n## Start config for SERVER-SIDE ##\n"
 
-mkdir -p $project_name/server/configs
+mkdir -p $application_name/server/configs
 
 # Add user interaction for choosing node version for docker containers
 docker_container_node_version=latest
@@ -14,7 +14,7 @@ if [ "$use_latest" = "n" ]; then
 fi
 
 # Write server/dev.Dockerfile
-cat << EOF > $project_name/server/dev.Dockerfile
+cat << EOF > $application_name/server/dev.Dockerfile
 FROM "node:$docker_container_node_version"
 
 WORKDIR /app
@@ -27,7 +27,7 @@ CMD npm run dev
 EOF
 
 # Write server/Dockerfile
-cat << EOF > $project_name/server/Dockerfile
+cat << EOF > $application_name/server/Dockerfile
 # Stage 1: Build the application
 FROM "node:$docker_container_node_version" as build
 WORKDIR /app
@@ -45,8 +45,8 @@ CMD node ./index.js
 EOF
 
 # Write .env.dev
-cat << EOF > $project_name/server/configs/.env.dev
-DB_HOST="dev_database_$project_name" #service name of docker-compose.yml
+cat << EOF > $application_name/server/configs/.env.dev
+DB_HOST="dev_database_$application_name" #service name of docker-compose.yml
 DB_PORT=3306
 
 DB_DATABASE=test
@@ -57,8 +57,8 @@ SESSION_SECRET=test-session
 EOF
 
 # Write .env
-cat << EOF > $project_name/server/configs/.env
-DB_HOST="database_$project_name" #service name of docker-compose.yml
+cat << EOF > $application_name/server/configs/.env
+DB_HOST="database_$application_name" #service name of docker-compose.yml
 DB_PORT=3306
 
 DB_DATABASE=prod

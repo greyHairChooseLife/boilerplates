@@ -105,8 +105,6 @@ services:
       context: ../server/
       dockerfile: Dockerfile
     image: "server_$project_name"
-    volumes:
-      - ../server/:/app/
     env_file:
       - ../server/configs/.env
     networks:
@@ -120,8 +118,6 @@ services:
       context: ../client/
       dockerfile: Dockerfile
     image: "client_$project_name"
-    volumes:
-      - ../client/:/app/
     env_file:
       - ../client/configs/.env
     networks:

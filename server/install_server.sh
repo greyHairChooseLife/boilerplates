@@ -31,16 +31,19 @@ EOF
 
 # Write server/Dockerfile
 cat << EOF > $project_name/server/Dockerfile
-FROM "node:$docker_container_node_version"
-
+# Stage 1: Build the application
+FROM "node:$docker_container_node_version" as build
 WORKDIR /app
+COPY . .
+RUN npm install
+RUN npx tsc --outDir "./dist"
 
+# Stage 2: Deploy with necessary things
+FROM "node:$docker_container_node_version"
+WORKDIR /app
 COPY package*.json ./
-
-RUN npm i --only production
-
-COPY dist/ ./
-
+COPY --from=build /app/dist .
+RUN npm ci --omit=dev
 CMD node ./index.js
 EOF
 

@@ -33,15 +33,17 @@ EOF
 
 # Write client/Dockerfile
 cat << EOF > $project_name/client/Dockerfile
-FROM "node:$docker_container_node_version"
-
+# Stage 1: Build the application
+FROM "node:$docker_container_node_version" as build
 WORKDIR /app
+COPY . .
+RUN npm install
+RUN npm run build
 
-COPY build/ .
-
-RUN npm install -g serve
-
-CMD serve -s build -l 3000
+# Stage 2: Deploy with built only
+FROM nginx:latest
+COPY --from=build /app/build /usr/share/nginx/html
+CMD nginx -g daemon off;
 EOF
 
 echo -e "\n... Done!\n"

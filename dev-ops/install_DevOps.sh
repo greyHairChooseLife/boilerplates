@@ -20,7 +20,7 @@ fi
 
 # Write docker-compose.dev.yml
 cat << EOF > $application_name/dev-ops/docker-compose.$application_name.dev.yml
-version: $docker_compose_yml_version
+version: "$docker_compose_yml_version"
 
 services:
   dev_database_$application_name:
@@ -91,9 +91,11 @@ networks:
     external: true
 EOF
 
+rootDir=$(basename "$PWD")
+
 # Write docker-compose.yml
 cat << EOF > $application_name/dev-ops/docker-compose.$application_name.yml
-version: $docker_compose_yml_version
+version: "$docker_compose_yml_version"
 
 services:
   database_$application_name:
@@ -142,21 +144,8 @@ services:
       - 3000
     restart: unless-stopped
 
-  nginx_$application_name:
-    depends_on:
-      - client_$application_name
-    container_name: nginx_$application_name
-    image: "nginx:latest"
-    volumes:
-      - ../dev-ops/nginx/conf.d/:/etc/nginx/conf.d/
-    ports:
-      - "80:80"
-    networks:
-      - $application_name-net
-    restart: unless-stopped
-
 networks:
-  $application_name-net:
+  $rootDir-net:
     external: true
 EOF
 
@@ -184,31 +173,6 @@ server {
   location /api {
     rewrite /api/(.*) /$1 break;
     proxy_pass http://dev_server_$application_name;
-  }
-}
-EOF
-
-# Write nginx/conf.d
-cat << EOF > $application_name/dev-ops/nginx/conf.d/default.conf
-upstream client_$application_name {
-  server client_$application_name:3000;
-}
-
-upstream server_$application_name {
-  server server_$application_name:3001;
-}
-
-server {
-  listen 80;
-  listen [::]:80;
-
-  location / {
-    proxy_pass http://client_$application_name;
-  }
-
-  location /api {
-    rewrite /api/(.*) /$1 break;
-    proxy_pass http://server_$application_name;
   }
 }
 EOF

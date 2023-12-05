@@ -13,19 +13,12 @@ else
   mkdir $project_name
 fi
 
-# Generate docker network
+# Generate dev-docker-network
 docker network create dev-$project_name-net > /dev/null 2>&1
 if [ $? -eq 0 ]; then
   echo "docker network created: dev-$project_name-net"
 else
   echo "docker dev-network already exists."
-fi
-
-docker network create $project_name-net > /dev/null 2>&1
-if [ $? -eq 0 ]; then
-  echo "docker network created: $project_name-net"
-else
-  echo "docker network already exists."
 fi
 
 # Set dev port

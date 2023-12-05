@@ -5,9 +5,6 @@ echo -e "\n## Start config for DATABASE ##\n"
 mkdir -p $project_name/database/configs \
          $project_name/database/initSQL
 
-touch $project_name/database/configs/.env.dev \
-      $project_name/database/configs/.env
-
 # Add user interaction for choosing node version for docker containers
 docker_container_mariadb_version=latest
 read -p 'Try latest version of mariadb for docker container? (y/n): ' use_latest
@@ -19,16 +16,28 @@ fi
 
 # Write database/dev.Dockerfile
 cat << EOF > $project_name/database/dev.Dockerfile
-FROM mariadb:$docker_container_mariadb_version"
+FROM "mariadb:$docker_container_mariadb_version"
 
 COPY initSQL/*.sql /docker-entrypoint-initdb.d/
 EOF
 
 # Write database/Dockerfile
 cat << EOF > $project_name/database/Dockerfile
-FROM mariadb:$docker_container_mariadb_version"
+FROM "mariadb:$docker_container_mariadb_version"
 
 COPY initSQL/*.sql /docker-entrypoint-initdb.d/
+EOF
+
+# Write .env.dev
+cat << EOF > $project_name/database/configs/.env.dev
+MYSQL_DATABASE=test
+MARIADB_ROOT_PASSWORD=test
+EOF
+
+# Write .env
+cat << EOF > $project_name/database/configs/.env
+MYSQL_DATABASE=prod
+MARIADB_ROOT_PASSWORD=prod
 EOF
 
 echo -e "\n... Done!\n"

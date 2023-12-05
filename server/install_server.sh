@@ -4,9 +4,6 @@ echo -e "\n## Start config for SERVER-SIDE ##\n"
 
 mkdir -p $project_name/server/configs
 
-touch $project_name/server/configs/.env.dev \
-      $project_name/server/configs/.env
-
 # Add user interaction for choosing node version for docker containers
 docker_container_node_version=latest
 read -p 'Try latest version of node for docker container? (y/n): ' use_latest
@@ -45,6 +42,30 @@ COPY package*.json ./
 COPY --from=build /app/dist .
 RUN npm ci --omit=dev
 CMD node ./index.js
+EOF
+
+# Write .env.dev
+cat << EOF > $project_name/server/configs/.env.dev
+DB_HOST="dev_database_$project_name" #service name of docker-compose.yml
+DB_PORT=3306
+
+DB_DATABASE=test
+DB_PASS=test
+DB_USER=root
+
+SESSION_SECRET=test-session
+EOF
+
+# Write .env
+cat << EOF > $project_name/server/configs/.env
+DB_HOST="database_$project_name" #service name of docker-compose.yml
+DB_PORT=3306
+
+DB_DATABASE=prod
+DB_PASS=prod
+DB_USER=root
+
+SESSION_SECRET=prod-session
 EOF
 
 echo -e "\n... Done!\n"

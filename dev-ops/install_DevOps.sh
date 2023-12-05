@@ -2,7 +2,9 @@
 
 echo -e "\n## Start config for DevOps ##\n"
 
-mkdir -p $project_name/dev-ops/configs
+mkdir -p $project_name/dev-ops/configs/ \
+         $project_name/dev-ops/nginx/conf.dev.d/ \
+         $project_name/dev-ops/nginx/conf.d/
 
 touch $project_name/dev-ops/configs/.env.dev \
       $project_name/dev-ops/configs/.env
@@ -16,7 +18,7 @@ if [ "$use_latest" = "n" ]; then
   eval docker_compose_yml_version='$docker_compose_yml_version_input'
 fi
 
-# Write docker-compose.yml : Developing 
+# Write docker-compose.dev.yml
 cat << EOF > $project_name/dev-ops/docker-compose.$project_name.dev.yml
 version: $docker_compose_yml_version
 
@@ -68,7 +70,7 @@ services:
     container_name: dev_nginx_$project_name
     image: "nginx:latest"
     volumes:
-      - ../dev-ops/configs/nginx/conf.dev.d/:/etc/nginx/conf.d/
+      - ../dev-ops/nginx/conf.dev.d/:/etc/nginx/conf.d/
     ports:
       - "$dev_port:80"
     networks:
@@ -77,6 +79,61 @@ services:
 networks:
   dev-$project_name-net:
     external: true
+EOF
+
+# TODO :
+# 1. Write docker-compose.yml and commit
+# 2. Make cert-bot container and commit
+# 3. and maybe.. Test??
+
+# Write nginx/conf.dev.d
+cat << EOF > $project_name/dev-ops/nginx/conf.dev.d/default.conf
+upstream dev_client_$project_name {
+  server dev_client_$project_name:3000;
+}
+
+upstream dev_server_$project_name {
+  server dev_server_$project_name:4000;
+}
+
+server {
+  listen 80;
+  listen [::]:80;
+
+  location / {
+    proxy_pass http://dev_client_$project_name;
+  }
+
+  location /api {
+    rewrite /api/(.*) /$1 break;
+    proxy_pass http://dev_server_$project_name;
+  }
+}
+EOF
+
+# Write nginx/conf.d
+cat << EOF > $project_name/dev-ops/nginx/conf.d/default.conf
+upstream client_$project_name {
+  server client_$project_name:3000;
+}
+
+upstream server_$project_name {
+  server server_$project_name:4000;
+}
+
+server {
+  listen 80;
+  listen [::]:80;
+
+  location / {
+    proxy_pass http://client_$project_name;
+  }
+
+  location /api {
+    rewrite /api/(.*) /$1 break;
+    proxy_pass http://server_$project_name;
+  }
+}
 EOF
 
 echo -e "\n... Done!\n"

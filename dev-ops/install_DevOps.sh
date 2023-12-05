@@ -33,6 +33,9 @@ services:
       - ../database/configs/.env.dev
     networks:
       - dev-$project_name-net
+    expose:
+      - 3306
+    restart: unless-stopped
 
   dev_server_$project_name:
     depends_on:
@@ -48,6 +51,9 @@ services:
       - ../server/configs/.env.dev
     networks:
       - dev-$project_name-net
+    expose:
+      - 3001
+    restart: unless-stopped
 
   dev_client_$project_name:
     depends_on:
@@ -63,6 +69,9 @@ services:
       - ../client/configs/.env.dev
     networks:
       - dev-$project_name-net
+    expose:
+      - 3000
+    restart: unless-stopped
 
   dev_nginx_$project_name:
     depends_on:
@@ -75,6 +84,7 @@ services:
       - "$dev_port:80"
     networks:
       - dev-$project_name-net
+    restart: unless-stopped
 
 networks:
   dev-$project_name-net:
@@ -96,6 +106,9 @@ services:
       - ../database/configs/.env
     networks:
       - $project_name-net
+    expose:
+      - 3306
+    restart: unless-stopped
 
   server_$project_name:
     depends_on:
@@ -109,6 +122,9 @@ services:
       - ../server/configs/.env
     networks:
       - $project_name-net
+    expose:
+      - 3001
+    restart: unless-stopped
 
   client_$project_name:
     depends_on:
@@ -122,6 +138,9 @@ services:
       - ../client/configs/.env
     networks:
       - $project_name-net
+    expose:
+      - 3000
+    restart: unless-stopped
 
   nginx_$project_name:
     depends_on:
@@ -134,6 +153,7 @@ services:
       - "80:80"
     networks:
       - $project_name-net
+    restart: unless-stopped
 
 networks:
   $project_name-net:
@@ -142,7 +162,6 @@ EOF
 
 # TODO :
 # 2. Make cert-bot container and commit
-# 3. and maybe.. Test??
 
 # Write nginx/conf.dev.d
 cat << EOF > $project_name/dev-ops/nginx/conf.dev.d/default.conf
@@ -151,7 +170,7 @@ upstream dev_client_$project_name {
 }
 
 upstream dev_server_$project_name {
-  server dev_server_$project_name:4000;
+  server dev_server_$project_name:3001;
 }
 
 server {
@@ -176,7 +195,7 @@ upstream client_$project_name {
 }
 
 upstream server_$project_name {
-  server server_$project_name:4000;
+  server server_$project_name:3001;
 }
 
 server {

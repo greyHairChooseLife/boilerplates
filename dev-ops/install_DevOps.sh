@@ -81,8 +81,70 @@ networks:
     external: true
 EOF
 
+# Write docker-compose.yml
+cat << EOF > $project_name/dev-ops/docker-compose.$project_name.yml
+version: $docker_compose_yml_version
+
+services:
+  database_$project_name:
+    container_name: db_$project_name
+    build:
+      context: ../database/
+      dockerfile: Dockerfile
+    image: "db_$project_name"
+    env_file:
+      - ../database/configs/.env
+    networks:
+      - $project_name-net
+
+  server_$project_name:
+    depends_on:
+      - database_$project_name
+    container_name: server_$project_name
+    build:
+      context: ../server/
+      dockerfile: Dockerfile
+    image: "server_$project_name"
+    volumes:
+      - ../server/:/app/
+    env_file:
+      - ../server/configs/.env
+    networks:
+      - $project_name-net
+
+  client_$project_name:
+    depends_on:
+      - server_$project_name
+    container_name: client_$project_name
+    build:
+      context: ../client/
+      dockerfile: Dockerfile
+    image: "client_$project_name"
+    volumes:
+      - ../client/:/app/
+    env_file:
+      - ../client/configs/.env
+    networks:
+      - $project_name-net
+
+  nginx_$project_name:
+    depends_on:
+      - client_$project_name
+    container_name: nginx_$project_name
+    image: "nginx:latest"
+    volumes:
+      - ../dev-ops/nginx/conf.d/:/etc/nginx/conf.d/
+    ports:
+      - "80:80"
+    networks:
+      - $project_name-net
+
+networks:
+  $project_name-net:
+    external: true
+EOF
+
 # TODO :
-# 1. Write docker-compose.yml and commit
 # 2. Make cert-bot container and commit
 # 3. and maybe.. Test??
 

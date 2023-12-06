@@ -40,11 +40,20 @@ services:
     image: "nginx:latest"
     volumes:
       - ../dev-ops/nginx/conf.d/:/etc/nginx/conf.d/
+      - ../dev-ops/certbot/conf/:/etc/letsencrypt/:ro
+      - ../dev-ops/certbot/www:/var/www/certbot/:ro
     ports:
       - "80:80"
+      - "443:443"
     networks:
       - $rootDir-net
     restart: unless-stopped
+
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - ../dev-ops/certbot/conf/:/etc/letsencrypt/:ro
+      - ../dev-ops/certbot/www:/var/www/certbot/:ro
 
 networks:
   $rootDir-net:

@@ -186,6 +186,25 @@ else
 fi
 EOF
 
+# Write sub-command
+# Write script to get SSL certificate from certbot
+cat << EOF > $rootDir/commanders/commands/get-ssl-cert.sh
+#!/bin/bash
+# Get SSL certificate from certbot
+# https://certbot.eff.org/docs/using.html#renewing-certificates
+
+# Help message for myself
+echo -e "\n  This script is for getting SSL certificate from certbot.\n"
+echo -e "  You can get SSL certificate from certbot by running this script.\n"
+echo -e "  korean blog reference: https://qspblog.com/blog/SSL-%EC%9D%B8%EC%A6%9D-%EB%B0%9B%EA%B8%B0-docker-%EC%82%AC%EC%9A%A9-certbot-%EC%9C%BC%EB%A1%9C-certificates-%EB%B0%9B%EA%B8%B0-https%EB%A1%9C-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0-php%EC%99%80-nginx-%EC%9B%B9%EC%84%9C%EB%B2%84#certbot-%EB%8F%84%EC%BB%A4-%EC%BB%A8%ED%85%8C%EC%9D%B4%EB%84%88"
+echo -e "  korean git reference: https://github.com/terrificmn/docker-laravel#https-%EC%9D%B8%EC%A6%9D-%EB%B0%9B%EA%B8%B0\n"
+
+domain_name=example.com
+read -p "domain name: " domain_name
+
+docker compose run --rm certbot certonly --webroot --webroot-path /var/www/certbot/ -d \$domain_name
+EOF
+
 echo -e "\n  Groundwork finish..! Let's make something!!\n"
 
 tree $rootDir

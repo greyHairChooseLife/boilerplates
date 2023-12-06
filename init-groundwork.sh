@@ -10,7 +10,9 @@ if [ -d "$rootDir" ]; then
   echo "The directory is exists."
   exit 0
 else
-  mkdir -p $rootDir/dev-ops/nginx/conf.d
+  mkdir -p $rootDir/dev-ops/nginx/conf.d \
+           $rootDir/configs \
+           $rootDir/commanders/commands
 fi
 
 # Generate docker-network
@@ -114,4 +116,76 @@ server {
 ###}
 EOF
 
-echo -e "\nFinish groundwork! Let's make new application!!\n\n"
+# Write commander.sh
+cat << EOF > $rootDir/commanders/commander.sh
+#!/bin/bash
+
+echo -e "\nList of running compose projects:\n"
+docker compose ls
+
+script_dir="\$(dirname "\$0")"
+
+# Function to display main menu
+show_menu() {
+  echo -e "\nList of applications:\n"
+
+  # Dynamically list available commands from the 'commands' subdirectory
+  commands_list=(\$(ls \$script_dir/commands/))
+
+  for ((i=0; i<\${#commands_list[@]}; i++)); do
+      echo "  \$((i+1)). Run \${commands_list[i]}"
+  done
+
+  echo -e "  0. Exit\n"
+}
+
+# Function to execute selected command
+execute_command() {
+  if [ "\$1" -eq 0 ]; then
+    echo -e "Exiting script.\n"
+    exit
+  elif [ "\$1" -le "\${#commands_list[@]}" ]; then
+    selected_command="\${commands_list[\$(($1-1))]}"
+    echo -e "Executing: \$selected_command\n"
+    source "\$script_dir/commands/\$selected_command"
+  else
+    echo "Invalid option"
+  fi
+}
+
+# Main script logic
+while true; do
+  show_menu
+  read -p "Enter your choice (0-\${#commands_list[@]}): " choice
+  execute_command \$choice
+done
+EOF
+
+# Write sub-command
+# Write nginx container initiative script to `docker-compose up and down`
+cat << EOF > $rootDir/commanders/commands/init-prod-nginx.sh
+#!/bin/bash
+
+read -p "Want to check which docker compose projects are running? (y/n): " check_compose
+
+if [ "\$check_compose" = "y" ]; then
+  docker compose ls
+fi
+
+echo -e "\ndocker compose project name: $rootDir"
+echo -e "running commands: \n"
+echo -e "  docker compose -p $rootDir -f $rootDir/dev-ops/docker-compose.$rootDir.yml up -d --build"
+echo -e "  docker compose -p $rootDir down --rmi all\n"
+
+read -p "Up or Down? (u/d): " up_or_down
+
+if [ "\$up_or_down" = "u" ]; then
+  docker compose -p $rootDir -f $rootDir/dev-ops/docker-compose.$rootDir.yml up -d --build
+else
+  docker compose -p $rootDir down --rmi all
+fi
+EOF
+
+echo -e "\n  Groundwork finish..! Let's make something!!\n"
+
+tree $rootDir

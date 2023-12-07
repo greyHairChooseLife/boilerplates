@@ -28,6 +28,7 @@ services:
     build:
       context: ../database/
       dockerfile: dev.Dockerfile
+      no_cache: true
     image: "dev_db_$application_name"
     env_file:
       - ../database/configs/.env.dev
@@ -44,6 +45,7 @@ services:
     build:
       context: ../server/
       dockerfile: dev.Dockerfile
+      no_cache: true
     image: "dev_server_$application_name"
     volumes:
       - ../server/:/app/
@@ -62,6 +64,7 @@ services:
     build:
       context: ../client/
       dockerfile: dev.Dockerfile
+      no_cache: true
     image: "dev_client_$application_name"
     volumes:
       - ../client/:/app/
@@ -103,6 +106,7 @@ services:
     build:
       context: ../database/
       dockerfile: Dockerfile
+      no_cache: true
     image: "db_$application_name"
     env_file:
       - ../database/configs/.env
@@ -119,6 +123,7 @@ services:
     build:
       context: ../server/
       dockerfile: Dockerfile
+      no_cache: true
     image: "server_$application_name"
     env_file:
       - ../server/configs/.env
@@ -135,6 +140,7 @@ services:
     build:
       context: ../client/
       dockerfile: Dockerfile
+      no_cache: true
     image: "client_$application_name"
     env_file:
       - ../client/configs/.env

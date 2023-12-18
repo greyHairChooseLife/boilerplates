@@ -65,39 +65,46 @@ EOF
 
 # Write nginx/conf.d
 cat << EOF > $rootDir/dev-ops/nginx/conf.d/default.conf
-server {
-  listen 80;
-  server_name localhost;
-
-  add_header Content-Type text/plain;
-  return 200 'hello world, groundwork is done by name of $HOME/$rootDir/';
-}
+###server {
+###  listen 80;
+###  server_name localhost;
+###
+###  add_header Content-Type text/plain;
+###  return 200 'hello world, groundwork is done by name of $HOME/$rootDir/';
+###}
 ###
 ### This is a example of nginx configuration for each APPLICATION
 ###
-###upstream client_\$APPLICATION_NAME {
-###  server client_\$APPLICATION_NAME:3000;
-###}
+upstream client_\$APPLICATION_NAME {
+  server client_\$APPLICATION_NAME:3000;
+}
+
+upstream server_\$APPLICATION_NAME {
+  server server_\$APPLICATION_NAME:3001;
+}
+
+server {
+  listen 80;
+  listen [::]:80;
+  server_name example.com;
+
+  location /.well-known/acme-challenge/ {
+      root /var/www/certbot;
+  }
+
+  location / {
+    proxy_pass http://client_\$APPLICATION_NAME;
+  }
 ###
-###upstream server_\$APPLICATION_NAME {
-###  server server_\$APPLICATION_NAME:3001;
-###}
+###  return 301 https://\$host\$request_uri;
 ###
-###server {
-###  listen 80;
-###  listen [::]:80;
-###  server_name example.com;
+### 1. 일단 이 상태로 SSL 인증서 받는다.
+###     >> docker-compose -f <이 nginx.conf를 활용하는 nginx 서버를 실행하는 docker-compose.yml파일> run --rm certbot certonly --webroot --webroot-path /var/www/certbot/ -d example.com
+### 2. 인증서 받은 후에 return 301 https://\$host\$request_uri; 주석 해제, 443으로 리다이렉트 해준다.
 ###
-###  location /.well-known/acme-challenge/ {
-###      root /var/www/certbot;
-###  }
 ###
-###  add_header Content-Type text/plain;
-###  return 200 'hello world, this is sangyeon kim!!!\n\n\nIf you see this page, \n\n 1) go get a SSL certificate by running script. You may find ./help if you need.\n\n2) manage nginx config to redirect to 443. It means remove annotations in front of "return 301 https://...."';
-###
-######  return 301 https://\$host\$request_uri;
-###}
-###
+}
+
 ###server {
 ###  listen 443 ssl;
 ###  listen [::]:443 ssl;

@@ -19,10 +19,6 @@ FROM "node:$docker_container_node_version"
 
 WORKDIR /app
 
-COPY . .
-
-RUN npm i
-
 CMD npm run dev
 EOF
 

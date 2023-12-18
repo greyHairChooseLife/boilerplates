@@ -18,7 +18,7 @@ fi
 
 # Write client/dev.Dockerfile
 cat << EOF > $application_name/client/dev.Dockerfile
-FROM "node:$docker_container_node_version"
+FROM node:$docker_container_node_version
 
 WORKDIR /app
 
@@ -28,7 +28,7 @@ EOF
 # Write client/Dockerfile
 cat << EOF > $application_name/client/Dockerfile
 # Stage 1: Build the application
-FROM "node:$docker_container_node_version" as build
+FROM node:$docker_container_node_version as build
 WORKDIR /app
 COPY . .
 RUN npm install

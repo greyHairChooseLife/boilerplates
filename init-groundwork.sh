@@ -95,7 +95,7 @@ server {
 ###  add_header Content-Type text/plain;
 ###  return 200 'hello world, this is sangyeon kim!!!\n\n\nIf you see this page, \n\n 1) go get a SSL certificate by running script. You may find ./help if you need.\n\n2) manage nginx config to redirect to 443. It means remove annotations in front of "return 301 https://...."';
 ###
-######  return 301 https://$host$request_uri;
+######  return 301 https://\$host\$request_uri;
 ###}
 ###
 ###server {

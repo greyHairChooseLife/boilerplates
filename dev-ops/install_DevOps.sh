@@ -186,7 +186,7 @@ server {
   }
 
   location /api {
-    rewrite /api/(.*) /$1 break;
+    rewrite /api/(.*) /\$1 break;
     proxy_pass http://dev_server_$application_name;
   }
 }

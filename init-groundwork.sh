@@ -12,7 +12,8 @@ if [ -d "$rootDir" ]; then
 else
   mkdir -p $rootDir/dev-ops/nginx/conf.d \
            $rootDir/configs \
-           $rootDir/commanders/commands
+           $rootDir/commanders/commands \
+           $rootDir/apps
 fi
 
 # Generate docker-network

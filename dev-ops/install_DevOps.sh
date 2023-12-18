@@ -168,12 +168,21 @@ upstream dev_server_$application_name {
   server dev_server_$application_name:3001;
 }
 
+map \$http_upgrade \$connection_upgrade {
+  default upgrade;
+  ''      close;
+}
+
 server {
   listen 80;
   listen [::]:80;
 
   location / {
     proxy_pass http://dev_client_$application_name;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade \$http_upgrade;
+    proxy_set_header Connection \$connection_upgrade;
+    proxy_set_header Host \$host;
   }
 
   location /api {

@@ -22,13 +22,7 @@ FROM "node:$docker_container_node_version"
 
 WORKDIR /app
 
-COPY package*.json ./
-
-RUN npm i
-
-COPY . .
-
-CMD PORT=3000 npm run dev
+CMD npm run dev
 EOF
 
 # Write client/Dockerfile

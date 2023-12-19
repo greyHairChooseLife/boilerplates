@@ -94,7 +94,7 @@ networks:
     external: true
 EOF
 
-rootDir=$(basename "$PWD")
+groundWorkDir=$(basename $(dirname $PWD))
 
 # Write docker-compose.yml
 cat << EOF > $application_name/dev-ops/docker-compose.$application_name.yml
@@ -111,7 +111,7 @@ services:
     env_file:
       - ../database/configs/.env
     networks:
-      - $application_name-net
+      - $groundWorkDir-net
     expose:
       - 3306
     restart: unless-stopped
@@ -128,7 +128,7 @@ services:
     env_file:
       - ../server/configs/.env
     networks:
-      - $application_name-net
+      - $groundWorkDir-net
     expose:
       - 3001
     restart: unless-stopped
@@ -145,13 +145,13 @@ services:
     env_file:
       - ../client/configs/.env
     networks:
-      - $application_name-net
+      - $groundWorkDir-net
     expose:
       - 3000
     restart: unless-stopped
 
 networks:
-  $rootDir-net:
+  $groundWorkDir-net:
     external: true
 EOF
 

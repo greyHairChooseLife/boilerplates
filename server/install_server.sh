@@ -36,12 +36,13 @@ FROM "node:$docker_container_node_version"
 WORKDIR /app
 COPY package*.json ./
 COPY --from=build /app/dist .
-RUN npm ci --omit=dev
+RUN npm install
 CMD node ./index.js
 EOF
 
 # Write .env.dev
 cat << EOF > $application_name/server/configs/.env.dev
+PORT=3001
 DB_HOST="dev_database_$application_name" #service name of docker-compose.yml
 DB_PORT=3306
 
@@ -54,6 +55,7 @@ EOF
 
 # Write .env
 cat << EOF > $application_name/server/configs/.env
+PORT=3001
 DB_HOST="database_$application_name" #service name of docker-compose.yml
 DB_PORT=3306
 

@@ -31,13 +31,18 @@ cat << EOF > $application_name/client/Dockerfile
 FROM node:$docker_container_node_version as build
 WORKDIR /app
 COPY . .
+RUN rm -rf node_modules
 RUN npm install
 RUN npm run build
 
-# Stage 2: Deploy with built only
-FROM nginx:latest
-COPY --from=build /app/build /usr/share/nginx/html
-CMD nginx -g daemon off;
+### Stage 2: Deploy with built only
+##FROM nginx:latest
+##COPY --from=build /app/build /usr/share/nginx/html
+##CMD nginx -g "daemon off";
+FROM node:$docker_container_node_version
+RUN npm install -g serve
+COPY --from=build /app/build build
+CMD serve -s build -l 3000
 EOF
 
 echo -e "\n... Done!\n"

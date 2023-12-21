@@ -209,9 +209,11 @@ echo -e "  korean blog reference: https://qspblog.com/blog/SSL-%EC%9D%B8%EC%A6%9
 echo -e "  korean git reference: https://github.com/terrificmn/docker-laravel#https-%EC%9D%B8%EC%A6%9D-%EB%B0%9B%EA%B8%B0\n"
 
 domain_name=example.com
+docker_compose_configuration=$rootDir/dev-ops/docker-compose.$rootDir.yml
 read -p "domain name: " domain_name
+#read -e -p "docker compose configuration: " docker_compose_configuration
 
-docker compose run --rm certbot certonly --webroot --webroot-path /var/www/certbot/ -d \$domain_name
+docker compose -f \$docker_compose_configuration run --rm certbot certonly --webroot --webroot-path /var/www/certbot/ -d \$domain_name
 EOF
 
 echo -e "\n  Groundwork finish..! Let's make something!!\n"

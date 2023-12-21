@@ -153,7 +153,8 @@ execute_command() {
     echo -e "Exiting script.\n"
     exit
   elif [ "\$1" -le "\${#commands_list[@]}" ]; then
-    selected_command="\${commands_list[\$(($1-1))]}"
+    # Correctly calculate the index based on the user input
+    selected_command="\${commands_list[\$((choice - 1))]}"
     echo -e "Executing: \$selected_command\n"
     source "\$script_dir/commands/\$selected_command"
   else

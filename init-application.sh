@@ -46,6 +46,42 @@ else
   cp $prettierrc $application_name/
 fi
 
+# Add script to run the application dev-server with docker-compose
+parent_dir="$(dirname $PWD)"
+cat << EOF > "$parent_dir/commanders/commands/init-app-$application_name.sh"
+#!/bin/bash
+
+# Get the directory of the current script
+script_dir="\$(dirname "\$0")"
+dev_docker_compose_file="\$(dirname \$(dirname \$script_dir))/apps/$application_name/dev-ops/docker-compose.$application_name.dev.yml"
+prod_docker_compose_file="\$(dirname \$(dirname \$script_dir))/apps/$application_name/dev-ops/docker-compose.$application_name.yml"
+
+# 개발용인지 프로덕션용인지 확인
+read -p '[D]evelopment or [P]roduction? (d/p): ' is_dev
+# 실행인지 중단인지 확인
+read -p '[U]p or [D]own? (u/d): ' is_up
+
+if [ "\$is_dev" = "d" ]; then
+  if [ "\$is_up" = "u" ]; then
+    docker-compose -p dev-$application_name -f \$dev_docker_compose_file up -d --build
+  elif [ "\$is_up" = "d" ]; then
+    docker-compose -p dev-$application_name -f \$dev_docker_compose_file down --rmi all
+  else
+    echo "Please enter the correct command."
+  fi
+elif [ "\$is_dev" = "p" ]; then
+  if [ "\$is_up" = "u" ]; then
+    docker-compose -p prod-$application_name -f \$prod_docker_compose_file up -d --build
+  elif [ "\$is_up" = "d" ]; then
+    docker-compose -p prod-$application_name -f \$prod_docker_compose_file down --rmi all
+  else
+    echo "Please enter the correct command."
+  fi
+else
+  echo "Please enter the correct command."
+fi
+EOF
+
 source $script_dir/client/install_client.sh
 source $script_dir/server/install_server.sh
 source $script_dir/database/install_db.sh

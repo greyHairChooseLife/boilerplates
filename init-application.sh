@@ -53,8 +53,8 @@ cat << EOF > "$parent_dir/commanders/commands/init-app-$application_name.sh"
 
 # Get the directory of the current script
 script_dir="\$(dirname "\$0")"
-dev_docker_compose_file="\$(dirname \$(dirname \$script_dir))/apps/$application_name/dev-ops/docker-compose.$application_name.dev.yml"
-prod_docker_compose_file="\$(dirname \$(dirname \$script_dir))/apps/$application_name/dev-ops/docker-compose.$application_name.yml"
+dev_docker_compose_file="\$(dirname \$(dirname \$script_dir))/$application_name/dev-ops/docker-compose.$application_name.dev.yml"
+prod_docker_compose_file="\$(dirname \$(dirname \$script_dir))/$application_name/dev-ops/docker-compose.$application_name.yml"
 
 # 개발용인지 프로덕션용인지 확인
 read -p '[D]evelopment or [P]roduction? (d/p): ' is_dev

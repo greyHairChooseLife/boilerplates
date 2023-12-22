@@ -39,7 +39,7 @@ version: "$docker_compose_yml_version"
 
 services:
   nginx_$rootDir:
-    container_name: nginx-$rootDir
+    container_name: prod-$rootDir-web_server
     image: "nginx:latest"
     volumes:
       - ../dev-ops/nginx/conf.d/:/etc/nginx/conf.d/
@@ -75,12 +75,12 @@ cat << EOF > $rootDir/dev-ops/nginx/conf.d/default.conf
 ###
 ### This is a example of nginx configuration for each APPLICATION
 ###
-upstream client_\$APPLICATION_NAME {
-  server client_\$APPLICATION_NAME:3000;
+upstream prod-\$APPLICATION_NAME-client {
+  server prod-\$APPLICATION_NAME-client:3000;
 }
 
-upstream server_\$APPLICATION_NAME {
-  server server_\$APPLICATION_NAME:3001;
+upstream prod-\$APPLICATION_NAME-server {
+  server prod-\$APPLICATION_NAME-server:3001;
 }
 
 server {
@@ -93,7 +93,7 @@ server {
   }
 
   location / {
-    proxy_pass http://client_\$APPLICATION_NAME;
+    proxy_pass http://prod-\$APPLICATION_NAME-client;
   }
 ###
 ###  return 301 https://\$host\$request_uri;
@@ -114,12 +114,12 @@ server {
 ###  ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
 ###
 ###  location / {
-###    proxy_pass http://client_\$APPLICATION_NAME;
+###    proxy_pass http://prod-\$APPLICATION_NAME-client;
 ###  }
 ###
 ###  location /api {
 ###    rewrite /api/(.*) /$1 break;
-###    proxy_pass http://server_\$APPLICATION_NAME;
+###    proxy_pass http://prod-\$APPLICATION_NAME-server;
 ###  }
 ###}
 EOF
@@ -183,15 +183,15 @@ fi
 
 echo -e "\ndocker compose project name: $rootDir"
 echo -e "running commands: \n"
-echo -e "  docker compose -p $rootDir -f $rootDir/dev-ops/docker-compose.$rootDir.yml up -d --build"
-echo -e "  docker compose -p $rootDir down --rmi all\n"
+echo -e "  docker compose -p prod-$rootDir-web_server -f $rootDir/dev-ops/docker-compose.$rootDir.yml up -d --build"
+echo -e "  docker compose -p prod-$rootDir-web_server down --rmi all\n"
 
 read -p "Up or Down? (u/d): " up_or_down
 
 if [ "\$up_or_down" = "u" ]; then
-  docker compose -p $rootDir -f $rootDir/dev-ops/docker-compose.$rootDir.yml up -d --build
+  docker compose -p prod-$rootDir-web_server -f $rootDir/dev-ops/docker-compose.$rootDir.yml up -d --build
 else
-  docker compose -p $rootDir down --rmi all
+  docker compose -p prod-$rootDir-web_server down --rmi all
 fi
 EOF
 

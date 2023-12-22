@@ -24,12 +24,12 @@ version: "$docker_compose_yml_version"
 
 services:
   dev_database_$application_name:
-    container_name: dev_db_$application_name
+    container_name: dev-$application_name-DB
     build:
       context: ../database/
       dockerfile: dev.Dockerfile
       no_cache: true
-    image: "dev_db_$application_name"
+    image: "dev-$application_name-DB"
     env_file:
       - ../database/configs/.env.dev
     networks:
@@ -41,12 +41,12 @@ services:
   dev_server_$application_name:
     depends_on:
       - dev_database_$application_name
-    container_name: dev_server_$application_name
+    container_name: dev-$application_name-server
     build:
       context: ../server/
       dockerfile: dev.Dockerfile
       no_cache: true
-    image: "dev_server_$application_name"
+    image: "dev-$application_name-server"
     volumes:
       - ../server/:/app/
     env_file:
@@ -60,12 +60,12 @@ services:
   dev_client_$application_name:
     depends_on:
       - dev_server_$application_name
-    container_name: dev_client_$application_name
+    container_name: dev-$application_name-client
     build:
       context: ../client/
       dockerfile: dev.Dockerfile
       no_cache: true
-    image: "dev_client_$application_name"
+    image: "dev-$application_name-client"
     volumes:
       - ../client/:/app/
     env_file:
@@ -79,7 +79,7 @@ services:
   dev_nginx_$application_name:
     depends_on:
       - dev_client_$application_name
-    container_name: dev_nginx_$application_name
+    container_name: dev-$application_name-web_server
     image: "nginx:latest"
     volumes:
       - ../dev-ops/nginx/conf.dev.d/:/etc/nginx/conf.d/
@@ -102,12 +102,12 @@ version: "$docker_compose_yml_version"
 
 services:
   database_$application_name:
-    container_name: db_$application_name
+    container_name: prod-$application_name-DB
     build:
       context: ../database/
       dockerfile: Dockerfile
       no_cache: true
-    image: "db_$application_name"
+    image: "prod-$application_name-DB"
     env_file:
       - ../database/configs/.env
     networks:
@@ -119,12 +119,12 @@ services:
   server_$application_name:
     depends_on:
       - database_$application_name
-    container_name: server_$application_name
+    container_name: prod-$application_name-server
     build:
       context: ../server/
       dockerfile: Dockerfile
       no_cache: true
-    image: "server_$application_name"
+    image: "prod-$application_name-server"
     env_file:
       - ../server/configs/.env
     networks:
@@ -136,12 +136,12 @@ services:
   client_$application_name:
     depends_on:
       - server_$application_name
-    container_name: client_$application_name
+    container_name: prod-$application_name-client
     build:
       context: ../client/
       dockerfile: Dockerfile
       no_cache: true
-    image: "client_$application_name"
+    image: "prod-$application_name-client"
     env_file:
       - ../client/configs/.env
     networks:
@@ -160,12 +160,12 @@ EOF
 
 # Write nginx/conf.dev.d
 cat << EOF > $application_name/dev-ops/nginx/conf.dev.d/default.conf
-upstream dev_client_$application_name {
-  server dev_client_$application_name:3000;
+upstream dev-$application_name-client {
+  server dev-$application_name-client:3000;
 }
 
-upstream dev_server_$application_name {
-  server dev_server_$application_name:3001;
+upstream dev-$application_name-server {
+  server dev-$application_name-server:3001;
 }
 
 map \$http_upgrade \$connection_upgrade {
@@ -178,7 +178,7 @@ server {
   listen [::]:80;
 
   location / {
-    proxy_pass http://dev_client_$application_name;
+    proxy_pass http://dev-$application_name-client;
     proxy_http_version 1.1;
     proxy_set_header Upgrade \$http_upgrade;
     proxy_set_header Connection \$connection_upgrade;
@@ -187,7 +187,7 @@ server {
 
   location /api {
     rewrite /api/(.*) /\$1 break;
-    proxy_pass http://dev_server_$application_name;
+    proxy_pass http://dev-$application_name-server;
   }
 }
 EOF

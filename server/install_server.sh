@@ -28,7 +28,6 @@ cat << EOF > $application_name/server/Dockerfile
 FROM "node:$docker_container_node_version" as build
 WORKDIR /app
 COPY . .
-RUN npm install
 RUN npx tsc --outDir "./dist"
 
 # Stage 2: Deploy with necessary things

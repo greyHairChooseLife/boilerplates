@@ -181,15 +181,16 @@ if [ "\$check_compose" = "y" ]; then
   docker compose ls
 fi
 
+script_dir="\$(dirname "\$0")"
 echo -e "\ndocker compose project name: $rootDir"
 echo -e "running commands: \n"
-echo -e "  docker compose -p prod-$rootDir-web_server -f $rootDir/dev-ops/docker-compose.$rootDir.yml up -d --build"
+echo -e "  docker compose -p prod-$rootDir-web_server -f \$(dirname \$script_dir)/dev-ops/docker-compose.$rootDir.yml up -d --build"
 echo -e "  docker compose -p prod-$rootDir-web_server down --rmi all\n"
 
 read -p "Up or Down? (u/d): " up_or_down
 
 if [ "\$up_or_down" = "u" ]; then
-  docker compose -p prod-$rootDir-web_server -f $rootDir/dev-ops/docker-compose.$rootDir.yml up -d --build
+  docker compose -p prod-$rootDir-web_server -f \$(dirname \$script_dir)/dev-ops/docker-compose.$rootDir.yml up -d --build
 else
   docker compose -p prod-$rootDir-web_server down --rmi all
 fi
@@ -209,9 +210,9 @@ echo -e "  korean blog reference: https://qspblog.com/blog/SSL-%EC%9D%B8%EC%A6%9
 echo -e "  korean git reference: https://github.com/terrificmn/docker-laravel#https-%EC%9D%B8%EC%A6%9D-%EB%B0%9B%EA%B8%B0\n"
 
 domain_name=example.com
-docker_compose_configuration=$rootDir/dev-ops/docker-compose.$rootDir.yml
 read -p "domain name: " domain_name
-#read -e -p "docker compose configuration: " docker_compose_configuration
+script_dir="\$(dirname "\$0")"
+docker_compose_configuration="\$(dirname \$script_dir)/dev-ops/docker-compose.$rootDir.yml"
 
 docker compose -f \$docker_compose_configuration run --rm certbot certonly --webroot --webroot-path /var/www/certbot/ -d \$domain_name
 EOF

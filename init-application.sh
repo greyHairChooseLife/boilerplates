@@ -82,6 +82,64 @@ else
 fi
 EOF
 
+# testing
+parent_dir="$(dirname $PWD)"
+cat << EOF >> "$parent_dir/dev-ops/nginx/conf.d/default.conf"
+
+############################################################################
+##########  This is new application named [ $application_name ].  ##########
+############################################################################
+###
+###upstream prod-$application_name-client {
+###  server prod-$application_name-client:3000;
+###}
+###
+###upstream prod-$application_name-server {
+###  server prod-$application_name-server:3001;
+###}
+###
+###server {
+###  listen 80;
+###  listen [::]:80;
+###  server_name example.com;
+###
+###  location /.well-known/acme-challenge/ {
+###      root /var/www/certbot;
+###  }
+###
+###    location / {
+###      proxy_pass http://prod-$application_name-client;
+###    }
+######
+######  return 301 https://\$host\$request_uri;
+######
+###### 1. 일단 이 상태로 SSL 인증서 받는다.
+######     >> docker-compose -f <이 nginx.conf를 활용하는 nginx 서버를 실행하는 docker-compose.yml파일> run --rm certbot certonly --webroot --webroot-path /var/www/certbot/ -d example.com
+###### 2. 인증서 받은 후에 return 301 https://\$host\$request_uri; 주석 해제, 443으로 리다이렉트 해준다.
+######
+######
+###}
+###
+###server {
+###  listen 443 ssl;
+###  listen [::]:443 ssl;
+###  server_name example.com;
+###
+###  ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;
+###  ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
+###
+###  location / {
+###    proxy_pass http://prod-$application_name-client;
+###  }
+###
+###  location /api {
+###    rewrite /api/(.*) /\$1 break;
+###    proxy_pass http://prod-$application_name-server;
+###  }
+###}
+
+EOF
+
 source $script_dir/client/install_client.sh
 source $script_dir/server/install_server.sh
 source $script_dir/database/install_db.sh

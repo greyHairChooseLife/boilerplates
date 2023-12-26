@@ -55,8 +55,8 @@ services:
   certbot:
     image: certbot/certbot:latest
     volumes:
-      - ../dev-ops/certbot/conf/:/etc/letsencrypt/:ro
-      - ../dev-ops/certbot/www:/var/www/certbot/:ro
+      - ../dev-ops/certbot/conf/:/etc/letsencrypt/
+      - ../dev-ops/certbot/www:/var/www/certbot/
 
 networks:
   $rootDir-net:
@@ -118,7 +118,7 @@ server {
 ###  }
 ###
 ###  location /api {
-###    rewrite /api/(.*) /$1 break;
+###    rewrite /api/(.*) /\$1 break;
 ###    proxy_pass http://prod-\$APPLICATION_NAME-server;
 ###  }
 ###}
